@@ -1,6 +1,6 @@
 import json, random, time
 import matplotlib.pyplot as plt
-file_path = 'VideoDialog/data/text_data/train_set4DSTC7-AVSD.json'
+file_path = 'process/text_data/train_set4DSTC7-AVSD.json'
 content = json.load(open(file_path))["dialogs"]
 x = []
 for item in content:

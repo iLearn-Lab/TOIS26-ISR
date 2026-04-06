@@ -3,8 +3,8 @@
 import os
 import cv2
 
-videos_src_path = 'VideoDialog/data/Charades_v1_480'
-videos_save_path = 'VideoDialog/data/frames_480p'
+videos_src_path = 'process/Charades_v1_480'
+videos_save_path = 'process/frames_480p'
 
 videos = os.listdir(videos_src_path)
 videos = filter(lambda x: x.endswith('mp4'), videos)

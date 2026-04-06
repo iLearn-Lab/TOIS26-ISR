@@ -69,7 +69,7 @@ def load(fea_types, fea_path, dataset_file, vocab, include_caption='none', separ
 
             if undisclosed_only:
                 assert dialog['dialog'][n]['answer'] == '__UNDISCLOSED__'
-            if (include_caption == 'caption' or include_caption == 'summary' or include_caption == 'caption,summary') and separate_caption:#执行
+            if (include_caption == 'caption' or include_caption == 'summary' or include_caption == 'caption,summary') and separate_caption:  # handled separately
                 history = [np.array([vocab['<blank>']], dtype=np.int32)]
             else:
                 history = [caption]
@@ -136,7 +136,7 @@ def create_dataset(data, batch_size, shuffle, include_caption='none', separate_c
         out['answer_in'].append(dialog[4])
         out['answer_out'].append(dialog[5])
 
-        if (include_caption == 'caption' or include_caption == 'summary' or include_caption == 'caption,summary') and separate_caption:#执行
+        if (include_caption == 'caption' or include_caption == 'summary' or include_caption == 'caption,summary') and separate_caption:  # handled separately
 
             out['caption'].append(dialog[6])
         if fts is not None:

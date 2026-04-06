@@ -52,7 +52,7 @@ def generate_response(model, data, loader, vocab, maxlen=20, beam=5, penalty=2.0
                     logging.info('REF: ' + qa['answer'])
                 # prepare input data
                 batch = next(it)
-                batch.move_to_cuda()
+                batch.move_to_device(device)
                 assert vid == batch.vids[0]
                 assert qa_id == batch.qa_ids[0]
                 qa_id += 1
@@ -119,8 +119,11 @@ if __name__ =="__main__":
     path = args.model_conf
     with open(path, 'rb') as f:
         vocab, train_args = pickle.load(f)
-    model = torch.load(args.model+'.pth.tar')
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    if args.gpu < 0 or not torch.cuda.is_available():
+        device = torch.device("cpu")
+    else:
+        device = torch.device("cuda:{}".format(args.gpu))
+    model = torch.load(args.model+'.pth.tar', map_location=device)
     model.to(device)
     # report data summary
     logging.info('#vocab = %d' % len(vocab))
@@ -132,7 +135,10 @@ if __name__ =="__main__":
                     max_history_length=train_args.max_history_length,
                     merge_source=train_args.merge_source,
                     undisclosed_only=args.undisclosed_only)
-    feature_dims = dh.feature_shape(test_data)
+    if test_data['features'] is None:
+        feature_dims = [1]
+    else:
+        feature_dims = dh.feature_shape(test_data)
     logging.info("Detected feature dims: {}".format(feature_dims))
     test_dataloader, test_samples = dh.create_dataset(test_data, 1, False, 
                                   include_caption=train_args.include_caption, separate_caption=train_args.separate_caption,

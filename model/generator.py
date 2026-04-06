@@ -62,7 +62,7 @@ class MultiPointerGenerator(nn.Module):
             pointer_attn = self.pointer_attn[idx].attn.squeeze(1)
 
             text_index = text.unsqueeze(1).expand_as(pointer_attn)
-            p_text_ptr = torch.zeros(p_vocab.size()).cuda()
+            p_text_ptr = torch.zeros(p_vocab.size(), device=p_vocab.device)
             p_text_ptr.scatter_add_(2, text_index, pointer_attn)
             p_text_ptr_ls.append(p_text_ptr)
 

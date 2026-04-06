@@ -6,11 +6,11 @@ from stanfordcorenlp import StanfordCoreNLP
 
 nlp = StanfordCoreNLP('http://localhost', port=9000)
 print("stanfordnlp  finish")
-predictor = Predictor.from_path("VideoDialog/coref-spanbert-large-2021.03.10.tar.gz")
+predictor = Predictor.from_path("coref-spanbert-large-2021.03.10.tar.gz")
 print("allennlp  finish")
 
-path = 'VideoDialog/data/coref_text_data/text_data/'
-new_path = 'VideoDialog/data/coref_text_data/'
+path = 'process/coref_text_data/'
+new_path = 'process/coref_text_data/'
 file_names = os.listdir(path)
 for file_name in file_names:
     print(file_name)

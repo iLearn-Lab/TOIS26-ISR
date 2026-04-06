@@ -2,7 +2,7 @@
 . path.sh
 
 #input choice 
-stage=$2        # <=1: preparation <=2: training <=3: generating <=4: evaluating
+stage=${1:-2}   # <=1: preparation <=2: training <=3: generating <=4: evaluating
 num_epochs=60   # e.g. 20
 warmup_steps=13000 # e.g. 9660
 dropout=0.2      # e.g. 0.2
@@ -15,11 +15,11 @@ max_his_len=-1                  # -1 1 2 ... 10; -1 for all dialogue turns possi
 merge_source=0                  # concatenate history(+caption) and query together as one single source sequence
 decode_data=off                 # use official data for testing 
 undisclosed_only=1              # only decode undisclosed dialogue turns in official data 
-data_root=VideoDialog/data                  # directory of data
-fea_dir=feature
+data_root=process               # directory of data
+fea_dir=process
 fea_file="<FeaType>/<ImageID>.pkl"
-fea_type=faster-rcnn     # resnext_spatiotemporal
-fea_names=faster-rcnn
+fea_type=none                  # use text-only mode by default
+fea_names=text-only
 
 # model setting 
 sep_his_embed=0         # separate history embedding from source sequence embedding 
@@ -71,7 +71,7 @@ enc_hsize_=`echo $enc_hsize|sed "s/ /-/g"`
 fea_type_=`echo $fea_type|sed "s/ /-/g"`
 
 # command settings
-gpu_id=0
+gpu_id=-1
 
 set -e
 set -u
@@ -97,7 +97,7 @@ if [ $stage -le 2 ]; then
     echo -------------------------
     echo stage 2: model training
     echo -------------------------
-    python train.py \
+    python3 train.py \
       --gpu $gpu_id \
       --fea-type $fea_type \
       --train-path "$fea_dir/$fea_file" \
@@ -143,7 +143,7 @@ if [ $stage -le 2 ]; then
         target=$(basename ${data_set%.*})
         result=${expdir}/result_${target}_b${beam}_p${penalty}_${decode_style}_undisclosed${undisclosed_only}.json
         test_log=${result%.*}.log
-        python generate.py \
+        python3 generate.py \
           --gpu $gpu_id \
           --test-path "$fea_dir/$fea_file" \
           --test-set $data_set \

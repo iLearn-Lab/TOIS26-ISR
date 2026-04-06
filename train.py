@@ -18,13 +18,14 @@ def seed_torch(seed=1):
 	os.environ['PYTHONHASHSEED'] = str(seed) 
 	np.random.seed(seed)
 	torch.manual_seed(seed)
-	torch.cuda.manual_seed(seed)
-	torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
-	torch.backends.cudnn.benchmark = False
-	torch.backends.cudnn.deterministic = True
+	if torch.cuda.is_available():
+		torch.cuda.manual_seed(seed)
+		torch.cuda.manual_seed_all(seed) # if you are using multi-GPU.
+		torch.backends.cudnn.benchmark = False
+		torch.backends.cudnn.deterministic = True
 
 
-def run_epoch(loader, epoch, model, loss_compute, eval=False):
+def run_epoch(loader, epoch, model, loss_compute, device, eval=False):
     "Standard Training and Logging Function"
     # total_qtokens = 0
     total_tokens = 0 
@@ -33,7 +34,7 @@ def run_epoch(loader, epoch, model, loss_compute, eval=False):
     # accumulation_steps = 4
     it = tqdm(enumerate(loader),total=len(loader), desc="epoch {}/{}".format(epoch+1, args.num_epochs), ncols=0)
     for j, batch in it:
-        batch.move_to_cuda()
+        batch.move_to_device(device)
         out = model.forward(batch)
         losses = loss_compute(out, batch)
         
@@ -140,7 +141,7 @@ if __name__ =="__main__":
                          vocab=vocab, max_history_length=args.max_history_length, 
                          merge_source=args.merge_source)
     if args.fea_type[0] == 'none':
-        feature_dims = 0
+        feature_dims = [1]
     else:
         feature_dims = dh.feature_shape(train_data)
     logging.info("Detected feature dims: {}".format(feature_dims))
@@ -166,11 +167,13 @@ if __name__ =="__main__":
     model = make_model(len(vocab), len(vocab), d_model=args.d_model, d_ff=args.d_ff,
       h=args.att_h, dropout=args.dropout,
       ft_sizes=feature_dims)
-    model.cuda()
     criterion = LabelSmoothing(size=len(vocab), padding_idx=vocab['<blank>'], smoothing=0.1)
-    criterion.cuda()	
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    if args.gpu < 0 or not torch.cuda.is_available():
+        device = torch.device("cpu")
+    else:
+        device = torch.device("cuda:{}".format(args.gpu))
     model.to(device)
+    criterion.to(device)
     # save meta parameters
     path = args.model + '.conf'
     with open(path, 'wb') as f:
@@ -204,7 +207,8 @@ if __name__ =="__main__":
         train_losses = run_epoch(train_dataloader, epoch,
                   model,
                   SimpleLossCompute(model.generator, model.auto_encoder_generator,
-                  criterion, opt=model_opt, l=args.loss_l))
+                  criterion, opt=model_opt, l=args.loss_l),
+                  device)
         logging.info("epoch: {} train loss: {} ".format(
             epoch + 1, train_losses['out']))
         # test on validation data 
@@ -215,6 +219,7 @@ if __name__ =="__main__":
                     model,
                     SimpleLossCompute(model.generator, model.auto_encoder_generator,
                     criterion,opt=None, l=args.loss_l),
+                    device,
                     eval=True)
         logging.info("epoch: {} valid loss: {}".format(
             epoch + 1, valid_losses['out']))

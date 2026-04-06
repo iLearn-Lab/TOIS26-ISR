@@ -119,28 +119,29 @@ class Batch:
         tgt_mask = tgt_mask & Variable(subsequent_mask(tgt.size(-1)).type_as(tgt_mask.data))
         return tgt_mask    
 
-    def move_to_cuda(self):
-        self.query = self.query.to('cuda', non_blocking=True)
-        self.his = self.his.to('cuda', non_blocking=True)
-        self.query_mask = self.query_mask.to('cuda', non_blocking=True)
-        self.his_mask = self.his_mask.to('cuda', non_blocking=True)
+    def move_to_device(self, device):
+        self.query = self.query.to(device, non_blocking=True)
+        self.his = self.his.to(device, non_blocking=True)
+        self.query_mask = self.query_mask.to(device, non_blocking=True)
+        self.his_mask = self.his_mask.to(device, non_blocking=True)
         if self.fts is not None:
-            self.fts = self.fts.to('cuda', non_blocking=True)
+            self.fts = self.fts.to(device, non_blocking=True)
             if self.fts_mask is not None:
-                self.fts_mask = self.fts_mask.to('cuda', non_blocking=True)
+                self.fts_mask = self.fts_mask.to(device, non_blocking=True)
             else:
-                self.spatial_mask = self.spatial_mask.to('cuda', non_blocking=True)
-                self.temporal_mask = self.temporal_mask.to('cuda', non_blocking=True)
+                self.spatial_mask = self.spatial_mask.to(device, non_blocking=True)
+                self.temporal_mask = self.temporal_mask.to(device, non_blocking=True)
         if self.audio_fts is not None:
-            self.audio_fts = self.audio_fts.to('cuda', non_blocking=True)
-            self.audio_mask = self.audio_mask.to('cuda', non_blocking=True)
+            self.audio_fts = self.audio_fts.to(device, non_blocking=True)
+            self.audio_mask = self.audio_mask.to(device, non_blocking=True)
         if self.cap is not None:
-            self.cap = self.cap.to('cuda', non_blocking=True)
-            self.cap_mask = self.cap_mask.to('cuda', non_blocking=True)
-        self.trg = self.trg.to('cuda', non_blocking=True)
-        self.trg_y = self.trg_y.to('cuda', non_blocking=True)
-        self.trg_mask = self.trg_mask.to('cuda', non_blocking=True)
-    
+            self.cap = self.cap.to(device, non_blocking=True)
+            self.cap_mask = self.cap_mask.to(device, non_blocking=True)
+        self.trg = self.trg.to(device, non_blocking=True)
+        self.trg_y = self.trg_y.to(device, non_blocking=True)
+        self.trg_mask = self.trg_mask.to(device, non_blocking=True)
+        self.trg_mean_mask = self.trg_mean_mask.to(device, non_blocking=True)
+
     def to_cuda(self, tensor):
         if self.cuda: return tensor.cuda()
         return tensor 

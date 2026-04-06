@@ -5,7 +5,11 @@ def get_median(data):
     half = len(data) // 2
     return (data[half] + data[~half]) / 2
 
-paths = ['VideoDialog/data/text_data/train_set4DSTC7-AVSD.json','VideoDialog/data/text_data/valid_set4DSTC7-AVSD.json','VideoDialog/data/text_data/test_set4DSTC7-AVSD.json']
+paths = [
+    'process/text_data/train_set4DSTC7-AVSD.json',
+    'process/text_data/valid_set4DSTC7-AVSD.json',
+    'process/text_data/test_set4DSTC7-AVSD.json',
+]
 for file in paths:
     print(file)
     content = json.load(open(file))["dialogs"] # list

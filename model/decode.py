@@ -22,9 +22,10 @@ def beam_search_decode(model, batch, max_len, start_symbol, unk_symbol, end_symb
         new_hyplist = []
         argmin = 0
         for out, lp, st in hyplist:
-            batch.trg = Variable(st).cuda()
-            batch.trg_mask = Variable(subsequent_mask(st.size(1)).long()).cuda()
-            batch.trg_mean_mask = torch.ones(batch.trg.shape).long().cuda()
+            device = batch.query.device
+            batch.trg = Variable(st).to(device)
+            batch.trg_mask = Variable(subsequent_mask(st.size(1)).long()).to(device)
+            batch.trg_mean_mask = torch.ones(batch.trg.shape).long().to(device)
 
             output = model.decode(batch, ft)
             output['decoded_text'] = output['decoded_text'][:,-1].unsqueeze(1)

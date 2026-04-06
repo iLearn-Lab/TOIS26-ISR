@@ -79,6 +79,8 @@ def make_model(src_vocab, tgt_vocab, d_model=128, d_ff=2048, h=8, dropout=0.2, f
     generator = MultiPointerGenerator(d_model, tgt_embed[0].lut.weight, pointer_attn, ptr_ft_ls)
 
     text_encoder=Encoder(d_model, nb_layers=3)
+    if not ft_sizes:
+        ft_sizes = [1]
     vid_W = nn.Linear(ft_sizes[0], d_model)
     vis_linear = Vislinear(c(vid_W), d_model)
     ae_generator = Generator(d_model, tgt_vocab, tgt_embed[0].lut.weight)

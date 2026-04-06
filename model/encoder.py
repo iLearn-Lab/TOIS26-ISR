@@ -140,7 +140,14 @@ class Vislinear(nn.Module):
         self.in_norm = LayerNorm(size)
 
     def forward(self, b, ft):
-        fts = nn.ReLU(inplace=True)(self.W(b.fts))
+        if b.fts is None:
+            batch_size = b.query.size(0)
+            device = b.query.device
+            dummy_shape = (batch_size, 1, 1, self.W.in_features)
+            raw_fts = torch.zeros(dummy_shape, device=device)
+        else:
+            raw_fts = b.fts
+        fts = nn.ReLU(inplace=True)(self.W(raw_fts))
         fts = self.in_norm(fts)
         # fts = fts.transpose(1, 2)
         ft['video_ft'] = fts
