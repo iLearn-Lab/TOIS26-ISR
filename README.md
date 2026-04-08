@@ -2,9 +2,18 @@
 
 > **TL;DR:** This repository provides the implementation of *Uncovering Hidden Connections: Iterative Search and Reasoning for Video-grounded Dialog*, with an additional runnable text-only workflow for quick training and generation.
 
-![](framework.jpg)
+## Authors
+
+Haoyu Zhang<sup>1,2</sup>, Meng Liu<sup>3*</sup>, Yisen Feng<sup>1</sup>, Yaowei Wang<sup>1,2*</sup>, Weili Guan<sup>1</sup>, Liqiang Nie<sup>1</sup>
+
+<sup>1</sup> School of Computer Science and Technology, Harbin Institute of Technology (Shenzhen), China  
+<sup>2</sup> Pengcheng Laboratory, China  
+<sup>3</sup> School of Computer Science and Technology, Shandong Jianzhu University, China  
+
+\* Corresponding authors
 
 ## 📝 Overview
+![](framework.jpg)
 ISR is designed for video-grounded dialog generation and consists of a textual encoder, a visual encoder, and a generator:
 
 - The textual encoder iteratively searches dialogue history for key semantic cues.
